@@ -1,4 +1,4 @@
-    <html lang="en">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,16 +9,20 @@
     
     <script>
         const sleep = ms => new Promise(r => setTimeout(r, ms));
-        async function dropMilk(){
+        async function dropMilk() {
+            document.querySelector('button').disabled = true;
             var plane = document.getElementById("plane");
             var milk = document.getElementById("milk");
             planeTop = plane.getBoundingClientRect().top;
             milk.style.left  = plane.getBoundingClientRect().left;
+            milk.style.display = "block";
             for (var i = planeTop; i < body.clientHeight - (2.5*milk.clientHeight); i++){
                 // alert("in loop");
-                await sleep(2);
+                await sleep();
                 milk.style.top = i;
             }
+            milk.style.display = "none";
+            document.querySelector('button').disabled = false;
         }
         async function movePlane() {
             placeRandom();
