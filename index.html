@@ -17,7 +17,6 @@
             milk.style.left  = plane.getBoundingClientRect().left;
             milk.style.display = "block";
             for (var i = planeTop; i < body.clientHeight - (2.5*milk.clientHeight); i++){
-                // alert("in loop");
                 await sleep();
                 milk.style.top = i;
             }
@@ -29,15 +28,18 @@
             var plane = document.getElementById("plane");
             var body = document.getElementById("body");
             for (var i = 0; i < (body.clientWidth - plane.clientWidth); i++) {
-                await sleep();
-                // console.log(plane.style.left)
+                await sleep(2);
                 plane.style.left = i;
             }
             movePlane();
         }
         function placeRandom() {
             var body = document.getElementById("body");
+            var plane = document.getElementById("plane");
+            var cat = document.getElementById("pop-cat");
+
             plane.style.top= Math.floor(Math.random() * (body.clientHeight/2));
+            cat.style.left= Math.floor(Math.random() * (body.clientWidth - 2.5*cat.clientWidth));
         }
     </script> 
     <button onclick="dropMilk()" id="move-button">Drop Milk</button>
