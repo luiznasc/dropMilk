@@ -18,7 +18,7 @@
             planeTop = plane.getBoundingClientRect().top;
             milk.style.left  = plane.getBoundingClientRect().left;
             milk.style.display = "block";
-            for (let i = planeTop; i < body.clientHeight - (2.5*milk.clientHeight); i++){
+            for (let i = planeTop; i < body.clientHeight - (2.5*milk.clientHeight); i = i+2){
                 await sleep();
                 milk.style.top = i;
             }
@@ -39,7 +39,7 @@
             while (true) {
                 await sleep(2);
                 plane.style.left=pos;
-                pos = pos + 1;
+                pos = pos + 2;
                 if (pos >= (body.clientWidth - plane.clientWidth)) {
                     lapCount = lapCount + 1;
                     pos = 0;
@@ -92,6 +92,7 @@
     </script> 
     <div>Score: <div id="score">0</div></div>
     <button onclick="dropMilk()" id="move-button">Drop Milk</button>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <img src="plane.png" class="plane" id="plane">
     <img src="pop-cat.gif" class="pop-cat" id="pop-cat">
     <img src="milk.png" class="milk" id="milk">
