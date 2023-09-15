@@ -10,35 +10,36 @@
     <script>
         const sleep = ms => new Promise(r => setTimeout(r, ms));
         async function dropMilk() {
-            var plane = document.getElementById("plane");
-            var body = document.getElementById("body");
-            var milk = document.getElementById("milk");
+            let plane = document.getElementById("plane");
+            let body = document.getElementById("body");
+            let milk = document.getElementById("milk");
+            let cat = document.getElementById("pop-cat");
             document.querySelector('button').disabled = true;
             planeTop = plane.getBoundingClientRect().top;
             milk.style.left  = plane.getBoundingClientRect().left;
             milk.style.display = "block";
-            for (var i = planeTop; i < body.clientHeight - (2.5*milk.clientHeight); i++){
+            for (let i = planeTop; i < body.clientHeight - (2.5*milk.clientHeight); i++){
                 await sleep();
                 milk.style.top = i;
             }
+            score();
             milk.style.display = "none";
             document.querySelector('button').disabled = false;
         }
 
         async function movePlane() {
-            var plane = document.getElementById("plane");
-            var body = document.getElementById("body");
+            let plane = document.getElementById("plane");
+            let body = document.getElementById("body");
             // for (var i = 0; i < (body.clientWidth - plane.clientWidth); i++) {
             //     await sleep(2);
             //     plane.style.left = i;
             // }
-            var pos = 0;
-            var lapCount = 0;
+            let pos = 0;
+            let lapCount = 0;
             while (true) {
                 await sleep(2);
                 plane.style.left=pos;
                 pos = pos + 1;
-                console.log(pos + ' 1');
                 if (pos >= (body.clientWidth - plane.clientWidth)) {
                     lapCount = lapCount + 1;
                     pos = 0;
@@ -48,34 +49,46 @@
                         moveCat();
                     }
                 }
-                console.log(pos + ' 2');
                 plane.style.left = pos;
             }
         }
 
         function changeHeight() {
-            var plane = document.getElementById("plane");
-            var body = document.getElementById("body");
+            let plane = document.getElementById("plane");
+            let body = document.getElementById("body");
             plane.style.top= Math.floor(Math.random() * (body.clientHeight/2)); //Only half to make it more consistent
         }
 
         function moveCat() {
-            var body = document.getElementById("body");
-            var cat = document.getElementById("pop-cat");
+            let body = document.getElementById("body");
+            let cat = document.getElementById("pop-cat");
             // Some weird math for cat's position to prevent it from going too close
             // to the walls
-            var catBox = Math.floor(Math.random() * (body.clientWidth - 2.5*cat.clientWidth));
+            let catBox = Math.floor(Math.random() * (body.clientWidth - 2.5*cat.clientWidth));
             if (catBox < cat.clientWidth*2){
                 catBox = cat.clientWidth*2;
             } else if (catBox > (body.clientWidth - (cat.clientWidth*2))) {
                 catBox = body.clientWidth - (cat.clientWidth*2);
             }
-            cat.style.left= catBox
+            cat.style.left= catBox;
         }
 
-    </script> 
-    <button onclick="dropMilk()" id="move-button">Drop Milk</button>
+        function score() {
+            let cat = document.getElementById("pop-cat");
+            let score = document.getElementById("score");
+            let milk = document.getElementById("milk");
 
+            milkCore = (milk.getBoundingClientRect().right + milk.getBoundingClientRect().left)/2;
+            catLeft = cat.getBoundingClientRect().left
+            catRight = cat.getBoundingClientRect().right
+            if ((milkCore > catLeft) && (milkCore <= catRight)){
+                score.innerHTML++;
+            }
+            
+        }
+    </script> 
+    <div>Score: <div id="score">0</div></div>
+    <button onclick="dropMilk()" id="move-button">Drop Milk</button>
     <img src="plane.png" class="plane" id="plane">
     <img src="pop-cat.gif" class="pop-cat" id="pop-cat">
     <img src="milk.png" class="milk" id="milk">
