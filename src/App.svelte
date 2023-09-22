@@ -2,29 +2,47 @@
   import { onMount } from "svelte";
 
 
-	let main, plane, milk, cat;
-	
-	let disabled = false;
-	let right  = 0;
-	let left = 0;
-	let top = 0;
+	let main, plane, milk, cat, score, milkCore;
 
-	$: planeStyle = `top: ${top}px; left: ${left}px; right: ${right}px`
+	let display = 'none';
+	let milkWidth = 42
+	let catWidth = 69;
+
+	let planeRight, planeLeft, planeTop, catLeft, catRight, milkLeft, milkTop;
+	planeRight = planeLeft = planeTop = catLeft = catRight = milkLeft = milkTop = 0;
+
+	$: planeStyle = `top: ${planeTop}px; left: ${planeLeft}px; right: ${planeRight}px`
+	$: catStyle = `left: ${catLeft}px; right: ${catRight}px; width: ${catWidth}px;`
+	$: milkStyle = `top: ${milkTop}px; left: ${milkLeft}px; display: ${display}; width: ${milkWidth}px;`
 
 	const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
 	async function dropMilk() {
-		disabled = true; 
-		await sleep(200);
-		disabled = false;
+		milkLeft = planeLeft;
+		display = "block";
+		for (let i = planeTop; i < main.clientHeight - (milk.clientHeight); i = i+2){
+			await sleep();
+			milkTop = i;
+		}
+		runScore();
+		display = "none";
 	}
 
+
 	function changeHeight() {
-		console.log('height');
+		planeTop= Math.floor(Math.random() * (main.clientHeight/2)); //Only half to make it more consistent
 	}
 
 	function moveCat(){
-		console.log('moveCat');
+		// Some weird math for cat's position to prevent it from going too close
+		// to the walls
+		let catBox = Math.floor(Math.random() * (main.clientWidth - 2.5*cat.clientWidth));
+		if (catBox < cat.clientWidth*2){
+			catBox = cat.clientWidth*2;
+		} else if (catBox > (main.clientWidth - (cat.clientWidth*2))) {
+			catBox = main.clientWidth - (cat.clientWidth*2);
+		}
+		catLeft = catBox;
 	}
 
 	async function movePlane() {
@@ -37,7 +55,6 @@
 		while (true) {
 			await sleep(2);
 			pos = pos + 2;
-			// console.log(main.clientWidth, plane);
 			if (pos >= (main.clientWidth - plane.clientWidth)) {
 				lapCount = lapCount + 1;
 				pos = 0;
@@ -46,25 +63,37 @@
 					moveCat();
 				}
 			}
-			// console.log(plane);
-			left = pos;
+			planeLeft = pos;
 		}
+	}
 
+	function runScore() {
+		milkCore = (milkLeft +milkWidth + milkLeft)/2;
+		if ((milkCore > catLeft) && (milkCore <= catLeft+catWidth)){
+			score.innerHTML++;
+			moveCat();
+		} else {
+			score.innerHTML = 0;
+		}
 	}
 
 	onMount(movePlane);
+	onMount(moveCat);
 </script>
 
-<main bind:this={main}>
-	<button {disabled} on:click={dropMilk} class='move-button'>Drop Milk</button>
+<main bind:this={main} on:click={dropMilk} on:keydown={dropMilk}>
 	<img src='plane.png' class='plane' alt='plane' style={planeStyle} bind:this={plane}/>
-	<img src='milk.png' class='milk' alt='milk' bind:this={milk}/>
-	<img src='pop-cat.gif' class='cat' alt='pop-cat' bind:this={cat}/>
+	<img src='milk.png' class='milk' alt='milk' {display} style={milkStyle} bind:this={milk}/>
+	<img src='pop-cat.gif' class='cat' alt='pop-cat' style={catStyle} bind:this={cat}/>
+	<div>Score: <div bind:this={score}>0</div></div>
 </main>
 
 <style>
 	main {
+		height: 100%;
+		width: 100%;
 		background-color: lightblue;
+		text-align: center;
 	}
 
 	.plane {
@@ -73,16 +102,12 @@
 	}
 
 	.cat {
-		width: 69px;
 		position: absolute;
+		bottom: 0px;
 	}
 
 	.milk {
-		width: 42px;
 		position: absolute;
+		display: none;
 	}
-	
-    .move-button {
-    	position: bottom;
-    }
 </style>
