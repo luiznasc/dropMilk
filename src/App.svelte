@@ -1,6 +1,8 @@
 <script>
-  import { onMount } from "svelte";
+  	import { onMount } from "svelte";
+	import { Mutex } from 'async-mutex';
 
+	let mutex = new Mutex();
 
 	let main, plane, milk, cat, score, milkCore;
 
@@ -26,6 +28,18 @@
 		}
 		runScore();
 		display = "none";
+	}
+
+	async function dropMilkQueue() {
+		if (mutex.isLocked()) {
+			return;
+		}
+		const release = await mutex.acquire();
+		try {
+			await dropMilk();
+		} finally {
+			release();
+		}
 	}
 
 
@@ -81,7 +95,7 @@
 	onMount(moveCat);
 </script>
 
-<main bind:this={main} on:click={dropMilk} on:keydown={dropMilk}>
+<main bind:this={main} on:click={dropMilkQueue} on:keydown={dropMilkQueue}>
 	<img src='plane.png' class='plane' alt='plane' style={planeStyle} bind:this={plane}/>
 	<img src='milk.png' class='milk' alt='milk' {display} style={milkStyle} bind:this={milk}/>
 	<img src='pop-cat.gif' class='cat' alt='pop-cat' style={catStyle} bind:this={cat}/>
